@@ -28,6 +28,8 @@ typedef struct lua_ud_lock {
 LUAMOD_API int luaopen_std( lua_State *L );
 
 static int lua_std_lock( lua_State *L );
+static int lua_std_lock_gc( lua_State *L );
+
 static int lua_std_finite( lua_State *L );
 static int lua_std_get_pid( lua_State *L );
 static int lua_std_get_uid( lua_State *L );
@@ -35,8 +37,10 @@ static int lua_std_get_gid( lua_State *L );
 static int lua_std_intcase( lua_State *L );
 static int lua_std_sleep( lua_State *L );
 static int lua_std_microtime( lua_State *L );
+static int lua_std_chmod( lua_State *L );
+static int lua_std_fchmod( lua_State *L );
 
-static int lua_std_lock_gc( lua_State *L );
+long int oct2dec( long int octal );
 
 //
 
@@ -49,6 +53,8 @@ static const luaL_Reg __index[] = {
     {"intcase", lua_std_intcase},
     {"sleep", lua_std_sleep},
     {"microtime", lua_std_microtime},
+    {"chmod", lua_std_chmod},
+    {"fchmod", lua_std_fchmod},
     {NULL, NULL}
 };
 

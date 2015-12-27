@@ -142,3 +142,43 @@ static int lua_std_microtime( lua_State *L ) {
     lua_pushnumber(L, t.tv_sec + t.tv_nsec * 1e-9);
     return 1;
 }
+
+static int lua_std_chmod( lua_State *L ) {
+    const char *path = luaL_checkstring(L, 1);
+    long int mode = oct2dec(luaL_checknumber(L, 2));
+
+    int r = chmod(path, (mode_t)mode);
+
+    if ( r == -1 ) {
+        lua_errno(L);
+    } else {
+        lua_pushboolean(L, 1);
+        return 1;
+    }
+}
+
+static int lua_std_fchmod( lua_State *L ) {
+    int fd = luaL_checknumber(L, 1);
+    long int mode = oct2dec(luaL_checknumber(L, 2));
+
+    int r = fchmod(fd, (mode_t)mode);
+
+    if ( r == -1 ) {
+        lua_errno(L);
+    } else {
+        lua_pushboolean(L, 1);
+        return 1;
+    }
+}
+
+//
+
+long int oct2dec( long int octal ) {
+    long int decimal = 0;
+    int i = 0;
+    while ( octal ) {
+        decimal += (octal % 10) * pow(8, i++);
+        octal /= 10;
+    }
+    return decimal;
+}
