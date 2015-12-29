@@ -171,6 +171,53 @@ static int lua_std_fchmod( lua_State *L ) {
     }
 }
 
+static int lua_std_strict( lua_State *L ) {
+    int t;
+
+    if ( lua_istable(L, 1) ) {
+        lua_settop(L, 1);
+    } else {
+        lua_settop(L, 0);
+        lua_pushglobaltable(L);
+    }
+
+    if ( lua_getmetatable(L, 1) ) {
+        t = lua_getfield(L, -1, "__index");
+        lua_pop(L, 1);
+        if ( t ) {
+            lua_fail(L, "_G metatable already have __index method", 0);
+        }
+
+        t = lua_getfield(L, -1, "__newindex");
+        lua_pop(L, 1);
+        if ( t ) {
+            lua_fail(L, "_G metatable already have __index method", 0);
+        }
+
+        luaL_setfuncs(L, __strict, 0);
+    } else {
+        luaL_newlib(L, __strict);
+        lua_setmetatable(L, 1);
+    }
+
+    lua_pushboolean(L, 1);
+    return 1;
+}
+
+static int lua_std_strict__index( lua_State *L ) {
+    size_t len;
+    const char *str = luaL_tolstring(L, 2, &len);
+
+    return luaL_error(L, "strict get: unknown key: '%s'", str);
+}
+
+static int lua_std_strict__newindex( lua_State *L ) {
+    size_t len;
+    const char *str = luaL_tolstring(L, 2, &len);
+
+    return luaL_error(L, "strict set: unknown key: '%s'", str);
+}
+
 //
 
 long int oct2dec( long int octal ) {

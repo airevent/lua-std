@@ -40,6 +40,10 @@ static int lua_std_microtime( lua_State *L );
 static int lua_std_chmod( lua_State *L );
 static int lua_std_fchmod( lua_State *L );
 
+static int lua_std_strict( lua_State *L );
+static int lua_std_strict__index( lua_State *L );
+static int lua_std_strict__newindex( lua_State *L );
+
 long int oct2dec( long int octal );
 
 //
@@ -55,10 +59,17 @@ static const luaL_Reg __index[] = {
     {"microtime", lua_std_microtime},
     {"chmod", lua_std_chmod},
     {"fchmod", lua_std_fchmod},
+    {"strict", lua_std_strict},
     {NULL, NULL}
 };
 
 static const luaL_Reg __lock_index[] = {
     {"unlock", lua_std_lock_gc},
+    {NULL, NULL}
+};
+
+static const luaL_Reg __strict[] = {
+    {"__index", lua_std_strict__index},
+    {"__newindex", lua_std_strict__newindex},
     {NULL, NULL}
 };
