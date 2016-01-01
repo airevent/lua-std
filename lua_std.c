@@ -8,6 +8,11 @@ LUAMOD_API int luaopen_std( lua_State *L ) {
     lua_newmt(L, LUA_MT_LOCK, __lock_index, lua_std_lock_gc);
 
     luaL_newlib(L, __index);
+
+    lua_newtable(L);
+        #include "lua_std_flags.c"
+    lua_setfield(L, -2, "f");
+
     return 1;
 }
 
@@ -208,7 +213,25 @@ static int lua_std_strict__index( lua_State *L ) {
     size_t len;
     const char *str = luaL_tolstring(L, 2, &len);
 
-    return luaL_error(L, "strict get: unknown key: '%s'", str);
+    if ( strncmp("trace", str, len)==0 ) {
+        lua_getglobal(L, "require");
+        lua_insert(L, 2);
+        lua_settop(L, 3);
+
+        if ( lua_pcall(L, 1, 1, 0) != LUA_OK ) {
+            return luaL_error(L, "std.strict autoload failed: %s", lua_tostring(L, -1));
+        } else { // _G, trace
+            lua_pushvalue(L, 2); // _G, trace, trace
+            lua_insert(L, 1); // trace, _G, trace
+            lua_pushstring(L, str); // trace, _G, trace, "trace"
+            lua_insert(L, -2); // trace, _G, "trace", trace
+            lua_rawset(L, 2); // trace, _G
+            lua_settop(L, 1);// trace
+            return 1;
+        }
+    } else {
+        return luaL_error(L, "strict get: unknown key: '%s'", str);
+    }
 }
 
 static int lua_std_strict__newindex( lua_State *L ) {
@@ -216,6 +239,56 @@ static int lua_std_strict__newindex( lua_State *L ) {
     const char *str = luaL_tolstring(L, 2, &len);
 
     return luaL_error(L, "strict set: unknown key: '%s'", str);
+}
+
+static int lua_std_getrlimit( lua_State *L ) {
+    int resource = luaL_checkinteger(L, 1);
+
+    struct rlimit old_limit;
+
+    int r = getrlimit(resource, &old_limit);
+
+    if ( r == -1 ) {
+        lua_errno(L);
+    } else {
+        lua_pushinteger(L, old_limit.rlim_cur);
+        lua_pushinteger(L, old_limit.rlim_max);
+        return 2;
+    }
+}
+
+static int lua_std_setrlimit( lua_State *L ) {
+    int resource = luaL_checkinteger(L, 1);
+
+    struct rlimit new_limit;
+
+    new_limit.rlim_cur = luaL_checkinteger(L, 2);
+    new_limit.rlim_max = luaL_checkinteger(L, 3);
+
+    int r = setrlimit(resource, &new_limit);
+
+    if ( r == -1 ) {
+        lua_errno(L);
+    } else {
+        lua_pushboolean(L, 1);
+        return 1;
+    }
+}
+
+static int lua_std_trim( lua_State *L ) {
+    const char *front;
+    const char *end;
+    size_t size;
+
+    front = luaL_checklstring(L, 1, &size);
+    end = &front[size - 1];
+
+    for ( ; size && isspace(*front); size--,front++ );
+    for ( ; size && isspace(*end); size--,end-- );
+
+    lua_pushlstring(L, front, (size_t)(end - front) + 1);
+
+    return 1;
 }
 
 //

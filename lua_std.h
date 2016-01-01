@@ -5,10 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <fcntl.h>
+#include <stddef.h>
+#include <ctype.h>
 #include <sys/file.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "lua_pd.h"
 
@@ -39,6 +43,9 @@ static int lua_std_sleep( lua_State *L );
 static int lua_std_microtime( lua_State *L );
 static int lua_std_chmod( lua_State *L );
 static int lua_std_fchmod( lua_State *L );
+static int lua_std_getrlimit( lua_State *L );
+static int lua_std_setrlimit( lua_State *L );
+static int lua_std_trim( lua_State *L );
 
 static int lua_std_strict( lua_State *L );
 static int lua_std_strict__index( lua_State *L );
@@ -60,6 +67,9 @@ static const luaL_Reg __index[] = {
     {"chmod", lua_std_chmod},
     {"fchmod", lua_std_fchmod},
     {"strict", lua_std_strict},
+    {"getrlimit", lua_std_getrlimit},
+    {"setrlimit", lua_std_setrlimit},
+    {"trim", lua_std_trim},
     {NULL, NULL}
 };
 
