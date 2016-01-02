@@ -46,6 +46,7 @@ static int lua_std_fchmod( lua_State *L );
 static int lua_std_getrlimit( lua_State *L );
 static int lua_std_setrlimit( lua_State *L );
 static int lua_std_trim( lua_State *L );
+static int lua_std_concat( lua_State *L );
 
 static int lua_std_strict( lua_State *L );
 static int lua_std_strict__index( lua_State *L );
@@ -70,6 +71,7 @@ static const luaL_Reg __index[] = {
     {"getrlimit", lua_std_getrlimit},
     {"setrlimit", lua_std_setrlimit},
     {"trim", lua_std_trim},
+    {"concat", lua_std_concat},
     {NULL, NULL}
 };
 

@@ -291,6 +291,35 @@ static int lua_std_trim( lua_State *L ) {
     return 1;
 }
 
+static int lua_std_concat( lua_State *L ) {
+    size_t len, glue_len;
+    const char *str, *glue;
+    int i, n;
+    luaL_Buffer B;
+
+
+
+    glue = luaL_checklstring(L, 1, &glue_len);
+    n = lua_gettop(L);
+
+    if ( n==1 ) {
+        return 1;
+    } else {
+        luaL_buffinit(L, &B);
+
+        for ( i=2; i<=n; ++i ) {
+            str = luaL_tolstring(L, i, &len);
+            luaL_addlstring(&B, str, len);
+            if ( i < n ) {
+                luaL_addlstring(&B, glue, glue_len);
+            }
+        }
+
+        luaL_pushresult(&B);
+        return 1;
+    }
+}
+
 //
 
 long int oct2dec( long int octal ) {
