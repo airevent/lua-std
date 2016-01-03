@@ -15,6 +15,7 @@
 #include <sys/resource.h>
 
 #include "lua_pd.h"
+#include "lualib.h"
 
 //
 
@@ -47,6 +48,7 @@ static int lua_std_getrlimit( lua_State *L );
 static int lua_std_setrlimit( lua_State *L );
 static int lua_std_trim( lua_State *L );
 static int lua_std_concat( lua_State *L );
+static int lua_std_sandbox( lua_State *L );
 
 static int lua_std_strict( lua_State *L );
 static int lua_std_strict__index( lua_State *L );
@@ -72,6 +74,7 @@ static const luaL_Reg __index[] = {
     {"setrlimit", lua_std_setrlimit},
     {"trim", lua_std_trim},
     {"concat", lua_std_concat},
+    {"sandbox", lua_std_sandbox},
     {NULL, NULL}
 };
 
@@ -83,5 +86,17 @@ static const luaL_Reg __lock_index[] = {
 static const luaL_Reg __strict[] = {
     {"__index", lua_std_strict__index},
     {"__newindex", lua_std_strict__newindex},
+    {NULL, NULL}
+};
+
+static const luaL_Reg __std_lua_libs[] = {
+    {LUA_COLIBNAME, luaopen_coroutine},
+    {LUA_TABLIBNAME, luaopen_table},
+    {LUA_IOLIBNAME, luaopen_io},
+    {LUA_OSLIBNAME, luaopen_os},
+    {LUA_STRLIBNAME, luaopen_string},
+    {LUA_MATHLIBNAME, luaopen_math},
+    {LUA_UTF8LIBNAME, luaopen_utf8},
+    {LUA_DBLIBNAME, luaopen_debug},
     {NULL, NULL}
 };

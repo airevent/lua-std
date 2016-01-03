@@ -320,6 +320,26 @@ static int lua_std_concat( lua_State *L ) {
     }
 }
 
+static int lua_std_sandbox( lua_State *L ) {
+    const luaL_Reg *lib;
+
+    if ( lua_istable(L, 1) ) {
+        lua_settop(L, 1);
+    } else {
+        lua_settop(L, 0);
+        lua_newtable(L);
+    }
+
+    for ( lib=__std_lua_libs; lib->func; lib++ ) {
+        lua_pushstring(L, lib->name);
+        luaL_requiref(L, lib->name, lib->func, 0);
+        lua_trace_stack(L);
+        lua_rawset(L, -3);
+    }
+
+    return 1;
+}
+
 //
 
 long int oct2dec( long int octal ) {
