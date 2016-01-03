@@ -333,7 +333,6 @@ static int lua_std_sandbox( lua_State *L ) {
     for ( lib=__std_lua_libs; lib->func; lib++ ) {
         lua_pushstring(L, lib->name);
         luaL_requiref(L, lib->name, lib->func, 0);
-        lua_trace_stack(L);
         lua_rawset(L, -3);
     }
 
