@@ -196,7 +196,7 @@ static int lua_std_strict( lua_State *L ) {
         t = lua_getfield(L, -1, "__newindex");
         lua_pop(L, 1);
         if ( t ) {
-            lua_fail(L, "_G metatable already have __index method", 0);
+            lua_fail(L, "_G metatable already have __newindex method", 0);
         }
 
         luaL_setfuncs(L, __strict, 0);
